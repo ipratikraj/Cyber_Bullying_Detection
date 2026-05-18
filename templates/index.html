@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberShield — Cyberbullying Detection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & base ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #08090c;
+      --surface:   #111318;
+      --border:    #1e2130;
+      --text:      #e8eaf0;
+      --muted:     #7a7f96;
+      --accent:    #5b6af5;
+      --accent2:   #9b6bfa;
+      --danger:    #f04f6a;
+      --safe:      #3ecf8e;
+      --warn:      #f5a623;
+      --radius:    18px;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background decoration ──────────────────────────────────────── */
+    .bg-blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: .12;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-blob-1 { width: 600px; height: 600px; background: var(--accent); top: -200px; left: -200px; }
+    .bg-blob-2 { width: 500px; height: 500px; background: var(--accent2); bottom: -150px; right: -150px; }
+
+    /* ── Layout ─────────────────────────────────────────────────────── */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 72px;
+    }
+
+    .logo {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -.5px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo span { color: var(--accent); }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .9rem;
+      margin-left: 28px;
+      transition: color .2s;
+    }
+    nav a:hover { color: var(--text); }
+
+    /* ── Hero ───────────────────────────────────────────────────────── */
+    .hero { text-align: center; margin-bottom: 56px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(91,106,245,.12);
+      border: 1px solid rgba(91,106,245,.3);
+      color: #8b97f8;
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+    .badge::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(1.4); }
+    }
+
+    h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── Card ───────────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px;
+      margin-bottom: 28px;
+    }
+
+    /* ── Textarea ───────────────────────────────────────────────────── */
+    .textarea-wrap { position: relative; }
+
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      padding: 18px 20px 48px;
+      resize: vertical;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    textarea::placeholder { color: var(--muted); }
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(91,106,245,.15);
+    }
+
+    .char-count {
+      position: absolute;
+      bottom: 14px;
+      right: 16px;
+      font-size: .78rem;
+      color: var(--muted);
+    }
+    .char-count.warn { color: var(--warn); }
+
+    /* ── Buttons ────────────────────────────────────────────────────── */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-body);
+      font-size: .95rem;
+      font-weight: 600;
+      padding: 13px 28px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: transform .15s, opacity .15s, box-shadow .2s;
+    }
+    .btn:active { transform: scale(.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(91,106,245,.35);
+    }
+    .btn-primary:hover { box-shadow: 0 6px 28px rgba(91,106,245,.5); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: #2e3248; }
+
+    /* ── Spinner ────────────────────────────────────────────────────── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Result panel ───────────────────────────────────────────────── */
+    #result-panel {
+      display: none;
+      animation: slideUp .4s cubic-bezier(.22,1,.36,1);
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    .result-card {
+      border-radius: var(--radius);
+      padding: 32px;
+      border: 1px solid;
+      position: relative;
+      overflow: hidden;
+    }
+    .result-card.danger {
+      background: rgba(240,79,106,.07);
+      border-color: rgba(240,79,106,.3);
+    }
+    .result-card.safe {
+      background: rgba(62,207,142,.07);
+      border-color: rgba(62,207,142,.3);
+    }
+
+    .result-glow {
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: .15;
+      pointer-events: none;
+    }
+    .danger .result-glow  { background: var(--danger); }
+    .safe   .result-glow  { background: var(--safe); }
+
+    .result-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .result-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .danger .result-icon { background: rgba(240,79,106,.15); }
+    .safe   .result-icon { background: rgba(62,207,142,.15); }
+
+    .result-label {
+      font-family: var(--font-head);
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .danger .result-label { color: var(--danger); }
+    .safe   .result-label { color: var(--safe); }
+
+    .result-tip { color: var(--muted); font-size: .95rem; }
+
+    /* ── Confidence bar ─────────────────────────────────────────────── */
+    .conf-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+    .conf-pct { font-weight: 600; color: var(--text); }
+
+    .conf-bar-bg {
+      background: rgba(255,255,255,.06);
+      border-radius: 100px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .conf-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 1s cubic-bezier(.22,1,.36,1);
+      width: 0;
+    }
+    .danger .conf-bar-fill { background: linear-gradient(90deg, #f04f6a, #fa8b9b); }
+    .safe   .conf-bar-fill { background: linear-gradient(90deg, #3ecf8e, #7bedc4); }
+
+    /* ── Stats row ──────────────────────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .stat-box {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-num {
+      font-family: var(--font-head);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .stat-lbl { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── Error ──────────────────────────────────────────────────────── */
+    .error-msg {
+      color: var(--danger);
+      font-size: .9rem;
+      margin-top: 12px;
+      display: none;
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      margin-top: 80px;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .btn-row   { flex-direction: column; }
+      .btn       { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background blobs -->
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
+
+  <div class="wrapper">
+
+    <!-- Header -->
+    <header>
+      <a class="logo" href="/"><span>Cyber</span>Shield</a>
+      <nav>
+        <a href="/">Detector</a>
+        <a href="/about">About</a>
+        <a href="https://github.com/ipratikraj" target="_blank">GitHub</a>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="badge">AI Powered Detection</div>
+      <h1>Detect <em>Cyberbullying</em><br/>Protect Every Voice</h1>
+      <p class="subtitle">
+        Paste any message below. Our machine-learning model instantly
+        analyses it and tells you whether it contains harmful or bullying content.
+      </p>
+    </section>
+
+    <!-- Input card -->
+    <div class="card">
+      <div class="textarea-wrap">
+        <textarea
+          id="inputText"
+          placeholder="Type or paste a message here to analyse it…"
+          maxlength="1000"
+        ></textarea>
+        <span class="char-count" id="charCount">0 / 1000</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="analyseBtn" onclick="analyse()">
+          <span class="spinner" id="spinner"></span>
+          <span id="btnLabel">Analyse Message</span>
+        </button>
+        <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+      </div>
+
+      <p class="error-msg" id="errorMsg"></p>
+    </div>
+
+    <!-- Result panel -->
+    <div id="result-panel">
+      <div class="result-card" id="resultCard">
+        <div class="result-glow"></div>
+
+        <div class="result-header">
+          <div class="result-icon" id="resultIcon"></div>
+          <div>
+            <div class="result-label" id="resultLabel"></div>
+            <div class="result-tip"  id="resultTip"></div>
+          </div>
+        </div>
+
+        <div class="conf-row">
+          <span>Model Confidence</span>
+          <span class="conf-pct" id="confPct"></span>
+        </div>
+        <div class="conf-bar-bg">
+          <div class="conf-bar-fill" id="confBar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num">91%+</div>
+        <div class="stat-lbl">Model Accuracy</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">TF-IDF</div>
+        <div class="stat-lbl">Feature Extraction</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">LR</div>
+        <div class="stat-lbl">Logistic Regression</div>
+      </div>
+    </div>
+
+    <footer>
+      <p>Built with Python · Flask · scikit-learn &nbsp;|&nbsp;
+         <a href="https://github.com/" target="_blank">View on GitHub</a>
+      </p>
+        <p>Developed by Pratik Raj</p>
+        <p>MCA Student, CUSAT</p>
+        <p>AI-Based Cyberbullying Detection Mini Project</p>
+    </footer>
+
+  </div><!-- /wrapper -->
+
+  <script>
+    const textarea  = document.getElementById("inputText");
+    const charCount = document.getElementById("charCount");
+
+    textarea.addEventListener("input", () => {
+      const len = textarea.value.length;
+      charCount.textContent = `${len} / 1000`;
+      charCount.classList.toggle("warn", len > 850);
+    });
+
+    async function analyse() {
+      const text = textarea.value.trim();
+      const errorMsg = document.getElementById("errorMsg");
+      errorMsg.style.display = "none";
+
+      if (!text) {
+        errorMsg.textContent = "Please enter some text first.";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      // Show spinner
+      const btn     = document.getElementById("analyseBtn");
+      const spinner = document.getElementById("spinner");
+      const label   = document.getElementById("btnLabel");
+      btn.disabled  = true;
+      spinner.style.display = "block";
+      label.textContent     = "Analysing…";
+
+      try {
+        const res  = await fetch("/predict", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ text }),
+        });
+        const data = await res.json();
+
+        if (data.error) {
+          errorMsg.textContent   = data.error;
+          errorMsg.style.display = "block";
+          return;
+        }
+
+        showResult(data);
+      } catch (e) {
+        errorMsg.textContent   = "Network error. Please try again.";
+        errorMsg.style.display = "block";
+      } finally {
+        btn.disabled          = false;
+        spinner.style.display = "none";
+        label.textContent     = "Analyse Message";
+      }
+    }
+
+    function showResult(data) {
+      const panel = document.getElementById("result-panel");
+      const card  = document.getElementById("resultCard");
+
+      // Update card style
+      card.className = `result-card ${data.verdict}`;
+
+      document.getElementById("resultIcon").textContent  = data.verdict === "danger" ? "🚨" : "✅";
+      document.getElementById("resultLabel").textContent = data.result;
+      document.getElementById("resultTip").textContent   = data.tip;
+      document.getElementById("confPct").textContent     = `${data.confidence}%`;
+
+      // Show panel, then animate bar
+      panel.style.display = "block";
+      panel.style.animation = "none";
+      void panel.offsetWidth;   // reflow
+      panel.style.animation = "";
+
+      setTimeout(() => {
+        document.getElementById("confBar").style.width = `${data.confidence}%`;
+      }, 100);
+
+      panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function clearAll() {
+      textarea.value = "";
+      charCount.textContent = "0 / 1000";
+      charCount.classList.remove("warn");
+      document.getElementById("result-panel").style.display = "none";
+      document.getElementById("errorMsg").style.display = "none";
+      document.getElementById("confBar").style.width = "0";
+      textarea.focus();
+    }
+
+    // Allow Ctrl+Enter to analyse
+    textarea.addEventListener("keydown", e => {
+      if (e.ctrlKey && e.key === "Enter") analyse();
+    });
+  </script>
+</body>
+</html>

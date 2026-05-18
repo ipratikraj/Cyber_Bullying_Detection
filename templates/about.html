@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — CyberShield</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #08090c; --surface: #111318; --border: #1e2130;
+      --text: #e8eaf0; --muted: #7a7f96; --accent: #5b6af5; --accent2: #9b6bfa;
+      --danger: #f04f6a; --safe: #3ecf8e; --radius: 18px;
+      --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 16px; line-height: 1.7; min-height: 100vh; }
+    .bg-blob { position: fixed; border-radius: 50%; filter: blur(120px); opacity: .1; pointer-events: none; z-index: 0; }
+    .bg-blob-1 { width: 500px; height: 500px; background: var(--accent); top: -150px; left: -150px; }
+    .wrapper { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 64px; }
+    .logo { font-family: var(--font-head); font-weight: 800; font-size: 1.35rem; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    nav a { color: var(--muted); text-decoration: none; font-size: .9rem; margin-left: 28px; transition: color .2s; }
+    nav a:hover { color: var(--text); }
+    h1 { font-family: var(--font-head); font-size: 2.4rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+    h2 { font-family: var(--font-head); font-size: 1.25rem; font-weight: 700; margin: 40px 0 12px; color: var(--text); }
+    p  { color: var(--muted); margin-bottom: 16px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; margin-bottom: 24px; }
+    .pipeline { display: flex; gap: 0; margin: 24px 0; flex-wrap: wrap; }
+    .step { flex: 1; min-width: 120px; background: rgba(91,106,245,.08); border: 1px solid rgba(91,106,245,.2); border-radius: 10px; padding: 16px; text-align: center; position: relative; margin: 4px; }
+    .step-num { font-family: var(--font-head); font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+    .step-lbl { font-size: .82rem; color: var(--muted); margin-top: 4px; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .tag { background: rgba(91,106,245,.1); border: 1px solid rgba(91,106,245,.25); color: #8b97f8; font-size: .82rem; padding: 5px 14px; border-radius: 100px; }
+    footer { text-align: center; margin-top: 64px; color: var(--muted); font-size: .85rem; }
+    footer a { color: var(--accent); text-decoration: none; }
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); text-decoration: none; font-size: .9rem; margin-bottom: 36px; }
+  </style>
+</head>
+<body>
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="wrapper">
+    <header>
+      <a class="logo" href="/"><span>Cyber</span>Shield</a>
+      <nav>
+        <a href="/">Detector</a>
+        <a href="/about">About</a>
+        <a href="https://github.com/" target="_blank">GitHub</a>
+      </nav>
+    </header>
+
+    <a class="back-link" href="/">← Back to Detector</a>
+
+    <h1>About This Project</h1>
+    <p><p>This project was developed by Pratik Raj, MCA student at CUSAT, as a mini project to detect cyberbullying content using Machine Learning and NLP (Natural Language Processing) techniques.The system analyses text messages and predicts whether the content is harmful or non-harmful.
+    </p></p>
+
+    <div class="card">
+      <h2>How It Works</h2>
+      <p>The system processes text through a classic NLP pipeline:</p>
+      <div class="pipeline">
+        <div class="step"><div class="step-num">1</div><div class="step-lbl">Input Text</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-lbl">Clean & Normalise</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-lbl">TF-IDF Vectors</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-lbl">Logistic Regression</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-lbl">Prediction</div></div>
+      </div>
+      <p>Text cleaning removes URLs and punctuation. TF-IDF (Term Frequency – Inverse Document Frequency) converts words into numerical features. The Logistic Regression classifier then predicts whether the message is cyberbullying or not, along with a confidence score.</p>
+    </div>
+
+    <div class="card">
+      <h2>Tech Stack</h2>
+      <div class="tag-row">
+        <span class="tag">Python 3</span>
+        <span class="tag">Flask</span>
+        <span class="tag">scikit-learn</span>
+        <span class="tag">TF-IDF Vectorizer</span>
+        <span class="tag">Logistic Regression</span>
+        <span class="tag">joblib</span>
+        <span class="tag">HTML/CSS/JS</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Model Performance</h2>
+      <p>The model was trained on a labelled dataset of bullying and non-bullying messages and achieves over <strong style="color:var(--safe)">91% accuracy</strong> on the test set. Precision and recall are balanced across both classes.</p>
+      <p>For a production system, you would train on a much larger dataset (e.g. the Kaggle Cyberbullying Classification dataset) to improve generalisation.</p>
+    </div>
+
+    <div class="card">
+      <h2>Disclaimer</h2>
+      <p>This project is built for educational and research purposes. The model may make mistakes — no AI classifier is perfect. Always use human judgement alongside automated tools when dealing with real-world moderation.</p>
+    </div>
+
+    <footer>
+      <p>CyberShield · Built with Python & Flask ·
+        <a href="https://github.com/" target="_blank">View on GitHub</a>
+      </p>
+    </footer>
+  </div>
+</body>
+</html>
